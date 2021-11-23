@@ -52,6 +52,11 @@ func ResourceEBSVolume() *schema.Resource {
 				Computed: true,
 				ForceNew: true,
 			},
+			"final_snapshot": {
+				Type:   schema.TypeBool, 
+				Optional: true 
+				Default: False 
+			},
 			"iops": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -316,6 +321,11 @@ func resourceEBSVolumeRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceEBSVolumeDelete(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*conns.AWSClient).EC2Conn
+
+	if d.Get('final_snapshot').(bool) {
+
+		log.Printf("[INFO] final_snapshot set to true, making final snapshot for volume %s: %s", d.Id())
+	}
 
 	input := &ec2.DeleteVolumeInput{
 		VolumeId: aws.String(d.Id()),
